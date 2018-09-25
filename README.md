@@ -1,6 +1,7 @@
 注: 
 下文内容及代码中出现的 [XX<...>] 为敏感信息不便写出, 或不同项目的配置项, 实际使用中参考替换即可.
 为了更详细说明细节及功能, 下文代码进行了详细注释说明.
+`iOSAutoArchive` 源代码已上传 `github`, [点击传送](https://github.com/augsun/iOSAutoArchive).
 
 ### 先看看分发出去的邮件内容:
 ```
@@ -191,7 +192,7 @@ log_pre_failure = '❌ =====>'
 ```
 #### 二, 功能实现代码
 ##### 1, 拉取代码 <pull_project>
-```
+```Python
 def pull_project():
 #开始打包的时间
     global build_startTimestamp
@@ -213,7 +214,29 @@ def pull_project():
     else:
         print('%s pull_project failure' % (log_pre_failure))
 ```
+注: 初次拉取代码前, 请用 SourceTree 对仓库进行一次 pull 和 push, 或手动做远程分支关联, 否则会出现如下情况:
+```
+Suns-iMac:merchant sun$ git pull
+There is no tracking information for the current branch.
+Please specify which branch you want to merge with.
+See git-pull(1) for details.
+
+    git pull <remote> <branch>
+
+If you wish to set tracking information for this branch you can do so with:
+
+    git branch --set-upstream-to=origin/<branch> master
+
+```
+
 ##### 2, 修改项目 build 号 <change_build>
+注:
+1,
+请保证 fir 上最新的 build 格式为 (xxx) 整数形式的 build 号. 如: 101.
+因为此步骤会自动取得 fir 上的最新 build 号, 并为此次打包的 build 加 1.
+如: 当前 fir 上的 build 号为 101, 那么此次打包后上传 fir 的包 build 为 102.
+2, 当前 xcode 里 Build 设置的值请设置为整数, 如 99.
+3, 目前对于 build 版本格式只兼容整数 build 号, 即 build 里不应该出现 ".", 如: 2.3.0.
 ```
 def change_build():
     print('%s start change_build\n' % (log_pre_success))
@@ -341,6 +364,7 @@ def upload_fir():
     else:
         print('%s upload_fir failure' % (log_pre_failure))
 ```
+上传 fir 后, 所有本地缓存文件都会删除, 不用担心留存磁盘占用空间.
 ##### 7, 发送邮件 <send_mail>
 ```
 def send_mail():
@@ -489,7 +513,7 @@ def main():
 main()
 ```
 #### 三, 一键打包
-在终端执行 iOSAutoArchive.py 即可.
+在终端执行 `python3 iOSAutoArchive.py` 即可.
 ```
 augsuns-MBP:Desktop augsun$ python3 iOSAutoArchive.py
 ```
